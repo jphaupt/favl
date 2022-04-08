@@ -12,7 +12,7 @@ module avl_tree
     private
         type(avl_tree_t), pointer :: left=>null()
         type(avl_tree_t), pointer :: right=>null()
-        real(dp), public :: value
+        real(dp), public :: val
         integer :: key
     contains
         ! TODO not sure if pass(self) should be here...
@@ -23,10 +23,18 @@ module avl_tree
 contains
 
     ! pure 
-    subroutine insert(self, key, value)
-        class(avl_tree_t), intent(inout) :: self
+    subroutine insert(self, key, val)
+        ! TODO should this be a pointer??
+        class(avl_tree_t), pointer, intent(inout) :: self
         integer, intent(in) :: key
-        real(dp), intent(in) :: value
+        real(dp), intent(in) :: val
+        if (.not. associated(self)) then
+            ! this is a null pointer, i.e. empty tree
+            ! TODO ? do I need to initialise it?
+            self%val=val
+            self%key=key
+            print*, 'what'
+        end if
         print*, "TODO stub"
     end subroutine insert
 
