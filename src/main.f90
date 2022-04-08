@@ -4,5 +4,5 @@ program main
     implicit none
     !! simply does a sort with an AVL tree
     type(avl_tree_t) :: test_tree
-    test_tree%insert(4)
+    call test_tree%insert(42, 2.0_dp)
 end program main

@@ -5,3 +5,5 @@ set(core_src
 set(main_src
     main.f90
 )
+
+add_executable(main ${main_src} ${core_src})
