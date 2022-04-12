@@ -10,6 +10,7 @@ program main
     call test_tree%insert(1, 2.12_dp)
     call test_tree%insert(3, 3.14159_dp)
     call test_tree%print()
+    print*, test_tree%find(2) ! 523
     ! call insert(test_tree, 23, 2.12_dp)
     ! call insert(test_tree, 25, 1.12_dp)
     ! call insert(test_tree, 2, 4.12_dp)

@@ -24,6 +24,7 @@ module avl_tree
     contains
         procedure, pass(self) :: insert=>insert_into_tree
         procedure, pass(self) :: print=>print_tree
+        procedure, pass(self) :: find
     end type avl_tree_t
 
     private
@@ -43,7 +44,31 @@ contains
         call print_from_node(self%root)
     end subroutine
 
+    ! not really sure why this can't be a pure function
+    real(dp) function find(self, key) result(val)
+        !! searches the binary tree for the given key and returns the
+        !! corresponding value if it is found
+        class(avl_tree_t), intent(in) :: self
+        integer, intent(in) :: key
+        ! TODO not sure why the one below doesn't work
+        val = find_from_node(self%root, key)
+    end function find
+
     !-----------NODE FUNCTIONS--------------------------------------------------
+    ! not really sure why this can't be a pure function
+    real(dp) recursive function find_from_node(root, key) result(val)
+        class(avl_node_t), pointer, intent(in) :: root
+        integer, intent(in) :: key
+        if(.not. associated(root)) return ! not found
+        if(root%key == key) then
+            val = root%val
+        else if(key < root%key) then ! left-subtree search
+            val = find_from_node(root%left, key)
+        else ! right-subtree search
+            val = find_from_node(root%right, key)
+        end if
+    end function find_from_node
+
     pure recursive subroutine insert_node(node, key, val)
         ! insert a new node with `key` and `val` given at the given node `node`
         class(avl_node_t), pointer, intent(inout) :: node
@@ -123,7 +148,7 @@ contains
             ! write(stdout,*) "left for key ", tree%key
         call print_from_node(root % left)
         ! write(stdout,fmt="(1x,i0)", advance="no") tree%key
-        write(stdout,fmt="(1x,i0)") root%key
+        write(stdout,fmt="(1x,i0,A,G0)") root%key, ', ', root%val
         ! write(stdout,*) "right for key ", tree%key
         ! if(associated(tree % right)) write(stdout,*) "right"
         call print_from_node(root % right)
