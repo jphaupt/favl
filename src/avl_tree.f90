@@ -70,7 +70,7 @@ contains
     end subroutine insert_node
 
     ! this function cannot be made pure I think
-    function singleLeftRotate(root) result(new_root)
+    pure subroutine singleLeftRotate(root)
         class(avl_node_t), pointer, intent(inout) :: root
         class(avl_node_t), pointer :: new_root
         new_root => root%right
@@ -78,9 +78,10 @@ contains
         new_root%left => root
         root%height = max(get_height(root%left), get_height(root%right))+1
         new_root%height = max(get_height(root%right), root%height)+1
-    end function singleLeftRotate
+        new_root => root
+    end subroutine singleLeftRotate
 
-    function singleRightRotate(root) result(new_root)
+    pure subroutine singleRightRotate(root)
         class(avl_node_t), pointer, intent(inout) :: root
         class(avl_node_t), pointer :: new_root
         new_root => root%left
@@ -88,21 +89,22 @@ contains
         new_root%right => root
         root%height = max(get_height(root%left), get_height(root%right))+1
         new_root%height = max(get_height(new_root%left), root%height)+1
-    end function singleRightRotate
+        new_root => root
+    end subroutine singleRightRotate
 
-    function doubleLeftRotate(root) result(new_root)
+    pure subroutine doubleLeftRotate(root)
         ! also known as left-right rotation
         class(avl_node_t), pointer, intent(inout) :: root
-        class(avl_node_t), pointer :: new_root
-        ! TODO
-    end function doubleLeftRotate
+        call singleRightRotate(root%right)
+        call singleLeftRotate(root)
+    end subroutine doubleLeftRotate
 
-    function doubleRightRotate(root) result(new_root)
+    pure subroutine doubleRightRotate(root)
         ! also known as right-left rotation
         class(avl_node_t), pointer, intent(inout) :: root
-        class(avl_node_t), pointer :: new_root
-        ! TODO
-    end function doubleRightRotate
+        call singleLeftRotate(root%left)
+        call singleRightRotate(root)
+    end subroutine doubleRightRotate
 
     recursive subroutine print_from_node(tree)
         !! prints tree in infix order
