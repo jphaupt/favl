@@ -23,6 +23,7 @@ module avl_tree
         class(avl_node_t), pointer :: root=>null()
     contains
         procedure, pass(self) :: insert=>insert_into_tree
+        procedure, pass(self) :: print=>print_tree
     end type avl_tree_t
 
     private
@@ -36,6 +37,11 @@ contains
         real(dp), intent(in) :: val
         call insert_node(self%root, key, val)
     end subroutine insert_into_tree
+
+    subroutine print_tree(self)
+        class(avl_tree_t), intent(in) :: self
+        call print_from_node(self%root)
+    end subroutine
 
     !-----------NODE FUNCTIONS--------------------------------------------------
     pure recursive subroutine insert_node(node, key, val)
@@ -109,18 +115,18 @@ contains
         call singleRightRotate(root)
     end subroutine doubleRightRotate
 
-    recursive subroutine print_from_node(tree)
+    recursive subroutine print_from_node(root)
         !! prints tree in infix order
         !! this is only really for debugging purposes
-        type (avl_node_t), intent(in), pointer :: tree  ! root node
-        if (associated (tree)) then
+        type (avl_node_t), intent(in), pointer :: root  ! root node
+        if (associated (root)) then
             ! write(stdout,*) "left for key ", tree%key
-        call print_from_node(tree % left)
+        call print_from_node(root % left)
         ! write(stdout,fmt="(1x,i0)", advance="no") tree%key
-        write(stdout,fmt="(1x,i0)") tree%key
+        write(stdout,fmt="(1x,i0)") root%key
         ! write(stdout,*) "right for key ", tree%key
         ! if(associated(tree % right)) write(stdout,*) "right"
-        call print_from_node(tree % right)
+        call print_from_node(root % right)
         end if
     end subroutine print_from_node
 
