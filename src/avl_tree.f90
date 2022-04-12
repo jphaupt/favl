@@ -2,6 +2,8 @@
 !!
 !! Implementation of an AVL tree
 !! in princple, I would prefer this to actually inherit/extend a generic BST
+!! Largely modified from https://gist.github.com/Harish-R/097688ac7f48bcbadfa5
+!! as well as the CASINO avl tree implementation
 
 
 module avl_tree
@@ -14,7 +16,7 @@ module avl_tree
         class(avl_node_t), pointer :: right=>null()
         real(dp), public :: val
         integer :: key
-        integer :: height
+        integer :: height=-1
 
     end type avl_node_t
     type avl_tree_t
@@ -28,14 +30,17 @@ module avl_tree
 
 contains
 
-    pure recursive subroutine insert_into_tree(self, key, val)
+    pure subroutine insert_into_tree(self, key, val)
         class(avl_tree_t), intent(inout) :: self
         integer, intent(in) :: key
         real(dp), intent(in) :: val
         call insert_node(self%root, key, val)
     end subroutine insert_into_tree
 
+    !-----------NODE FUNCTIONS--------------------------------------------------
     pure recursive subroutine insert_node(node, key, val)
+        ! TODO I think this should be a function which returns the new root
+        !       though I suppose I could also just change it in-place
         ! TODO at the moment, this insert is for a normal BST
         ! NOT an *AVL* tree!! (...yet)
         class(avl_node_t), pointer, intent(inout) :: node
@@ -47,30 +52,80 @@ contains
             ! TODO ? do I need to initialise it?
             node%val=val
             node%key=key
+            node%height=0
             nullify(node%left)
             nullify(node%right)
             ! print*, 'what'
+        ! TODO both the below could involve rotations and height adjustments
         else if (key < node%val) then ! left insert
             call insert_node(node%left, key, val)
+            if(get_height(node%left) - get_height(node%right) == 2) then
+                ! TODO
+            end if
         else ! right insert
             call insert_node(node%right, key, val)
+            ! TODO
         end if
         ! print*, "TODO stub"
     end subroutine insert_node
 
-    recursive subroutine print_tree(tree)
+    ! this function cannot be made pure I think
+    function singleLeftRotate(root) result(new_root)
+        class(avl_node_t), pointer, intent(inout) :: root
+        class(avl_node_t), pointer :: new_root
+        new_root => root%right
+        root%right => new_root%left
+        new_root%left => root
+        root%height = max(get_height(root%left), get_height(root%right))+1
+        new_root%height = max(get_height(root%right), root%height)+1
+    end function singleLeftRotate
+
+    function singleRightRotate(root) result(new_root)
+        class(avl_node_t), pointer, intent(inout) :: root
+        class(avl_node_t), pointer :: new_root
+        new_root => root%left
+        root%left => new_root%right
+        new_root%right => root
+        root%height = max(get_height(root%left), get_height(root%right))+1
+        new_root%height = max(get_height(new_root%left), root%height)+1
+    end function singleRightRotate
+
+    function doubleLeftRotate(root) result(new_root)
+        ! also known as left-right rotation
+        class(avl_node_t), pointer, intent(inout) :: root
+        class(avl_node_t), pointer :: new_root
+        ! TODO
+    end function doubleLeftRotate
+
+    function doubleRightRotate(root) result(new_root)
+        ! also known as right-left rotation
+        class(avl_node_t), pointer, intent(inout) :: root
+        class(avl_node_t), pointer :: new_root
+        ! TODO
+    end function doubleRightRotate
+
+    recursive subroutine print_from_node(tree)
         !! prints tree in infix order
         !! this is only really for debugging purposes
         type (avl_node_t), intent(in), pointer :: tree  ! root node
         if (associated (tree)) then
             ! write(stdout,*) "left for key ", tree%key
-        call print_tree (tree % left)
+        call print_from_node(tree % left)
         ! write(stdout,fmt="(1x,i0)", advance="no") tree%key
         write(stdout,fmt="(1x,i0)") tree%key
         ! write(stdout,*) "right for key ", tree%key
         ! if(associated(tree % right)) write(stdout,*) "right"
-        call print_tree (tree % right)
+        call print_from_node(tree % right)
         end if
-    end subroutine print_tree
+    end subroutine print_from_node
+
+    pure integer function get_height(node) result(h)
+        class(avl_node_t), pointer, intent(in) :: node
+        if (associated(node)) then
+            h=node%height
+        else
+            h=-1
+        end if
+    end function get_height
 
 end module avl_tree
