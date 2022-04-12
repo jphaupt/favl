@@ -50,7 +50,6 @@ contains
         !! corresponding value if it is found
         class(avl_tree_t), intent(in) :: self
         integer, intent(in) :: key
-        ! TODO not sure why the one below doesn't work
         val = find_from_node(self%root, key)
     end function find
 
@@ -103,7 +102,6 @@ contains
         end if
     end subroutine insert_node
 
-    ! this function cannot be made pure I think
     pure subroutine singleLeftRotate(root)
         class(avl_node_t), pointer, intent(inout) :: root
         class(avl_node_t), pointer :: new_root
@@ -145,12 +143,8 @@ contains
         !! this is only really for debugging purposes
         type (avl_node_t), intent(in), pointer :: root  ! root node
         if (associated (root)) then
-            ! write(stdout,*) "left for key ", tree%key
         call print_from_node(root % left)
-        ! write(stdout,fmt="(1x,i0)", advance="no") tree%key
         write(stdout,fmt="(1x,i0,A,G0)") root%key, ', ', root%val
-        ! write(stdout,*) "right for key ", tree%key
-        ! if(associated(tree % right)) write(stdout,*) "right"
         call print_from_node(root % right)
         end if
     end subroutine print_from_node
