@@ -39,34 +39,37 @@ contains
 
     !-----------NODE FUNCTIONS--------------------------------------------------
     pure recursive subroutine insert_node(node, key, val)
-        ! TODO I think this should be a function which returns the new root
-        !       though I suppose I could also just change it in-place
-        ! TODO at the moment, this insert is for a normal BST
-        ! NOT an *AVL* tree!! (...yet)
+        ! insert a new node with `key` and `val` given at the given node `node`
         class(avl_node_t), pointer, intent(inout) :: node
         integer, intent(in) :: key
         real(dp), intent(in) :: val
         if (.not. associated(node)) then
             allocate(node)
             ! this is a null pointer, i.e. empty tree
-            ! TODO ? do I need to initialise it?
             node%val=val
             node%key=key
             node%height=0
             nullify(node%left)
             nullify(node%right)
-            ! print*, 'what'
-        ! TODO both the below could involve rotations and height adjustments
-        else if (key < node%val) then ! left insert
+        else if (key < node%key) then ! left insert
             call insert_node(node%left, key, val)
             if(get_height(node%left) - get_height(node%right) == 2) then
-                ! TODO
+                if(key < node%left%key) then
+                    call singleRightRotate(node)
+                else
+                    call doubleRightRotate(node)
+                end if
             end if
         else ! right insert
             call insert_node(node%right, key, val)
-            ! TODO
+            if(get_height(node%right)-get_height(node%left)==2) then
+                if(key > node%right%key) then
+                    call singleLeftRotate(node)
+                else
+                    call doubleLeftRotate(node)
+                end if
+            end if
         end if
-        ! print*, "TODO stub"
     end subroutine insert_node
 
     ! this function cannot be made pure I think
